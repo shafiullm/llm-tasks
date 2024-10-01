@@ -1,78 +1,88 @@
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 
-function WaterTracker() {
-  const [remaining, setRemaining] = useState(3.7);
+function App() {
   const [consumed, setConsumed] = useState(0);
-  const [currentInput, setCurrentInput] = useState("0");
+  const [currentInput, setCurrentInput] = useState(0);
+  const [remaining, setRemaining] = useState(3.7);
 
-  const maxLiters = 3.7;
-  const minLiters = 2.7;
+  useEffect(() => {
+    setRemaining(Math.max(3.7 - consumed, 0));
+  }, [consumed]);
 
-  const handleAddWater = () => {
-    const amount = parseFloat(currentInput);
-    if (!isNaN(amount)) {
-      let newConsumed = consumed + amount;
-      let newRemaining = Math.max(minLiters, remaining - amount);
-      if (newConsumed > maxLiters) {
-        newConsumed = maxLiters;
-        newRemaining = minLiters;
-      }
-      setConsumed(newConsumed);
-      setRemaining(newRemaining);
-      setCurrentInput("0");
-    }
+  const addWater = () => {
+    setConsumed((prev) => Math.min(Math.max(prev + currentInput, 0), 3.7));
+    setCurrentInput(0);
   };
 
-  const handleClear = () => {
-    setRemaining(3.7);
+  const clearWater = () => {
     setConsumed(0);
-    setCurrentInput("0");
+    setCurrentInput(0);
   };
 
-  const changeInput = (change) => {
-    let newValue = parseFloat(currentInput) + change;
-    newValue = Math.max(0, Math.min(newValue, maxLiters - consumed));
-    setCurrentInput(newValue.toFixed(1));
+  const incrementInput = (value) => {
+    setCurrentInput((prev) => Math.min(Math.max(prev + value, 0), 3.7));
+  };
+
+  const getProgressColor = () => {
+    if (consumed > 3.7 || consumed < 1.7) return "red";
+    if (consumed >= 1.7 && consumed <= 2.7) return "yellow";
+    return "green";
   };
 
   return (
-    <Card className="max-w-sm mx-auto mt-10">
-      <CardHeader>
-        <CardTitle>Water Intake Tracker</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 text-center">
-          <p>Remaining: {remaining.toFixed(1)} L</p>
-          <p>Consumed: {consumed.toFixed(1)} L</p>
-        </div>
-        <div className="flex justify-center items-center space-x-2">
-          <Button onClick={() => changeInput(-0.1)}>-</Button>
-          <Input
-            type="number"
-            value={currentInput}
-            onChange={(e) => setCurrentInput(e.target.value)}
-            className="text-center w-20"
+    <div className="flex justify-center items-center h-screen bg-gray-100">
+      <Card className="w-full max-w-sm p-4 sm:p-6">
+        <CardHeader>
+          <CardTitle>Water Consumption Tracker</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Progress
+            value={Math.min((consumed / 3.7) * 100, 100)}
+            className={`h-4 ${getProgressColor()}-progress`}
           />
-          <Button onClick={() => changeInput(0.1)}>+</Button>
-        </div>
-        <div className="mt-4 flex justify-between">
-          <Button variant="outline" onClick={handleClear}>
-            Clear
-          </Button>
-          <Button onClick={handleAddWater}>Add</Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-export default function App() {
-  return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <WaterTracker />
+          <div className="flex justify-between items-center">
+            <span className="text-lg">Consumed: {consumed.toFixed(2)}L</span>
+            <span className="text-lg">Remaining: {remaining.toFixed(2)}L</span>
+          </div>
+          <p className="text-sm text-muted-foreground text-center">
+            Goal: 2.7 to 3.7 liters
+          </p>
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" onClick={() => incrementInput(-0.25)}>
+              -
+            </Button>
+            <Input
+              type="text"
+              value={currentInput.toFixed(2)}
+              onChange={(e) => setCurrentInput(parseFloat(e.target.value) || 0)}
+              className="text-center flex-grow"
+            />
+            <Button variant="outline" onClick={() => incrementInput(0.25)}>
+              +
+            </Button>
+          </div>
+          <div className="flex space-x-2">
+            <Button
+              onClick={addWater}
+              className="bg-red-500 hover:bg-red-600 text-white flex-grow"
+            >
+              Add
+            </Button>
+            <Button
+              onClick={clearWater}
+              className="bg-red-500 hover:bg-red-600 text-white flex-grow"
+            >
+              Clear
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
+
+export default App;
