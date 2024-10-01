@@ -1,12 +1,13 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 
-// Lazy load the components
 const Component1A = lazy(() => import("./1a.jsx"));
 const Component1B = lazy(() => import("./1b.jsx"));
 const Component1Ideal = lazy(() => import("./1ideal.jsx"));
+const Component2A = lazy(() => import("./40921_1a.jsx"));
+const Component2B = lazy(() => import("./40921_1b.jsx"));
+const Component2Ideal = lazy(() => import(".//40921_1ideal.jsx"));
 
-// Error boundary to handle component errors
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -35,12 +36,10 @@ const App = () => {
       <ErrorBoundary>
         <Suspense fallback={<div>Loading component...</div>}>
           <Routes>
-            {/* Main page with links */}
             <Route
               path="/"
               element={
                 <div>
-                  <h1>Welcome to the App</h1>
                   <nav>
                     <ul>
                       <li>
@@ -53,14 +52,27 @@ const App = () => {
                         <Link to="/1ideal">Go to 1Ideal</Link>
                       </li>
                     </ul>
+                    <ul>
+                      <li>
+                        <Link to="/40921_1a">Go to 40921_1A</Link>
+                      </li>
+                      <li>
+                        <Link to="/40921_1b">Go to 40921_1B</Link>
+                      </li>
+                      <li>
+                        <Link to="/40921_1ideal">Go to 40921_1ideal</Link>
+                      </li>
+                    </ul>
                   </nav>
                 </div>
               }
             />
-            {/* Render components as separate pages */}
             <Route path="/1a" element={<Component1A />} />
             <Route path="/1b" element={<Component1B />} />
             <Route path="/1ideal" element={<Component1Ideal />} />
+            <Route path="/40921_1a" element={<Component2A />} />
+            <Route path="/40921_1b" element={<Component2B />} />
+            <Route path="/40921_1ideal" element={<Component2Ideal />} />
           </Routes>
         </Suspense>
       </ErrorBoundary>
